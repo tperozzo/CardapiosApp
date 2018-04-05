@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bordo">#800000</color>
+    <color name="amareloqueimado">#d8b523</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
+    <color name="bordoMain">#99182c</color>
+    <color name="bordoDark">#640002</color>
+    <color name="bordoLight">#cf4e55</color>
+
+    <color name="crop__button_bar">#f3f3f3</color>
+    <color name="crop__button_text">#666666</color>
+    <color name="crop__selector_pressed">#1a000000</color>
+    <color name="crop__selector_focused">#77000000</color>
+
+    <color name="grey">#e0e0e0</color>
+    <color name="greyDark">#aeaeae</color>
+    <color name="greyDark2">#808080</color>
+
+</resources>

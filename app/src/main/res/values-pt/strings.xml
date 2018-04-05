@@ -1,0 +1,148 @@
+<resources>
+    <string name="app_name">CardapiosAplicativo</string>
+
+    <string name="navigation_drawer_open">Abrir navigation drawer</string>
+    <string name="navigation_drawer_close">Fechar navigation drawer</string>
+
+    <string name="restaurants">Área para restaurantes</string>
+
+    <string name="title_activity_cardy">Cardápio</string>
+    <string name="title_activity_user_sign_up">Cadastro</string>
+    <string name="title_activity_manage_restaurants">Gerenciar Restaurantes</string>
+    <string name="title_activity_manage_cardies">Gerenciar Cardápios</string>
+    <string name="title_activity_add_edit_cardy">Adicionar/Editar Cardápio</string>
+    <string name="title_activity_add_edit_restaurants">Adicionar/Editar Restaurante</string>
+    <string name="title_activity_user_login">Login</string>
+    <string name="title_activity_scan">Procurar Cardápios</string>
+    <string name="title_activity_crop">Cortar Imagem</string>
+    <string name="title_activity_confirm_restaurant">Confirmar Restaurante</string>
+    <string name="title_activity_user_settings">Configurações de Usuário</string>
+    <string name="remove_user">Remover Usuário</string>
+
+    <string name="sign_up">\t\t\t\tCadastrar</string>
+    <string name="email">E-mail</string>
+    <string name="password">Senha</string>
+    <string name="confirm_password">Confirmar senha</string>
+    <string name="login">\t\t\t\tLogin</string>
+
+    <!--SCAN ACTIVITY -->
+    <string name="click_button">Clique no botão superior direito para escolher os parâmetros de busca.</string>
+    <string name="verify_connections">Verifique sua conexão e suas permissões.</string>
+    <string name="none_rest">Nenhum restaurante encontrado.</string>
+    <string name="location_fail">Localização não encontrada.\nVerifique sua conexão e suas permissões.</string>
+    <string name="need_location_title">Este aplicativo precisa acessar sua localização</string>
+    <string name="need_location_msg">Por favor, permita o acesso a localização para então, o aplicativo detectar restaurantes próximos.</string>
+    <string name="need_extsd_title">Este aplicativo precisa acessar sua memória</string>
+    <string name="need_extsd_msg">Por favor, permita o acesso a memória para então, o aplicativo salvar alguns dados pertinentes.</string>
+    <string name="GPS_msg">A locatização está desativada no seu smartphone. Você gostaria de habilitá-la?</string>
+    <string name="GPS_btn">Configurações</string>
+
+    <!--CARDY ACTIVITY -->
+    <string name="today_card_is">O cardápio de hoje é:</string>
+
+    <!--SIGN UP ACTIVITY -->
+    <string name="email_empty">Campo de Email está vazio.</string>
+    <string name="email_invalid">Email inválido.</string>
+    <string name="password_empty">Campo de senha está vazio.</string>
+    <string name="cpassword_empty">Campo de confirmar senha está vazio.</string>
+    <string name="passwords_different">Senhas são diferentes.</string>
+    <string name="user_already_exists">Usuário já existe.</string>
+    <string name="sign_up_successful">Cadastro de usuário realizado com sucesso.</string>
+    <string name="sign_up_failed">Cadastro de usuário falhou.</string>
+    <string name="password_6_char">Senha deve ter no mínimo 6 caracteres.</string>
+
+    <!--LOGIN ACTIVITY -->
+    <string name="login_failed">Login falhou.</string>
+    <string name="password_invalid">Senha incorreta.</string>
+    <string name="login_successful">Login realizado com sucesso.</string>
+    <string name="user_does_not_exists">Usuário não existe.</string>
+
+    <!--MANAGE RESTS ACTIVITY -->
+    <string name="add">Adicionar</string>
+    <string name="edit">Editar</string>
+    <string name="manage_cards">Gerenciar cardápios</string>
+
+    <!--CONFIRM REST ACTIVITY -->
+    <string name="rest_updated">Restaurante atualizado!</string>
+    <string name="rest_updated_fail">Não foi possível atualizar o restaurante.</string>
+    <string name="rest_created">Restaurante criado!</string>
+    <string name="rest_created_fail">Não foi possível criar o restaurante.</string>
+    <string name="confirm_msg">    Confirma os dados do seu restaurante? \n    Assim ele aparecerá para os usuários.</string>
+
+    <!--MANAGE CARDS ACTIVITY -->
+    <string name="remove">Remover</string>
+
+    <!--ADD EDIT RESTS ACTIVITY -->
+    <string name="name_hint">Nome do Restaurante</string>
+    <string name="city_hint">Cidade</string>
+    <string name="address_hint">Endereço</string>
+    <string name="complement_hint">Complemento(opcional)</string>
+    <string name="latitude_hint">Latitude</string>
+    <string name="longitude_hint">Longitude</string>
+    <string name="invalid_address">Endereço inválido</string>
+    <string name="invalid_name">Nome inválido</string>
+    <string name="invalid_city">Cidade inválida</string>
+    <string name="invalid_latitude">Latitude inválida</string>
+    <string name="invalid_longitude">Longitude inválida</string>
+    <string name="edit_coord">Editar coordenadas</string>
+    <string name="crop__saving">Salvando a imagem…</string>
+    <string name="crop__wait">Espere um momento…</string>
+    <string name="crop__pick_error">Não tem imagens disponíveis</string>
+    <string name="crop__done">OK</string>
+    <string name="crop__cancel">CANCELAR</string>
+
+    <!--ADD EDIT CARDS ACTIVITY -->
+    <string name="card">Cardápio:</string>
+    <string name="card_date">Data do cardápio:</string>
+    <string name="card_created">Cardápio criado!</string>
+    <string name="card_created_fail">Não foi possível criar o cardápio.</string>
+    <string name="card_updated">Cardápio atualizado!</string>
+    <string name="card_updated_fail">Não foi possível atualizar o cardápio.</string>
+    <string name="card_empty">Cardápio vazio.</string>
+    <string name="invalid_date">Data inválida.</string>
+    <string name="invalid_days">You must choose at least one day of the week.</string>
+    <string name="removed_card">Cardápio excluído!</string>
+    <string name="removed_card_fail">Não foi possível excluir o cardápio.</string>
+    <string name="card_msg">Use este espaço da forma que desejar para postar seu cardápio do dia e, se desejar, para deixar uma mensagem aos seus possíveis clientes.</string>
+    <string name="daysOfWeek">Dias da semana:</string>
+
+    <!--USER SETTINGS ACTIVITY -->
+    <string name="update_user">Atualizar usuário</string>
+    <string name="database_fail">Não foi possível conectar ao banco de dados.</string>
+    <string name="updated_user">Usuário atualizado!</string>
+    <string name="updated_user_fail">Não foi possível atualizar o usuário.</string>
+
+    <string name="noconnection">Sem conexão com a internet.</string>
+    <string name="rest_name">Nome do restaurante</string>
+    <string name="food">Prato desejado</string>
+    <string name="dist">Distancia: </string>
+    <string name="busca">Busca</string>
+    <string name="ok">OK</string>
+    <string name="cancelar">Cancelar</string>
+
+    <string name="rest_name_msg">O restaurante deve ter um nome com pelo menos 3 caracteres.</string>
+    <string name="food_msg">O prato desejado deve ter um nome com pelo menos 3 caracteres.</string>
+    <string name="city_msg">A cidade deve ter um nome com pelo menos 3 caracteres.</string>
+    <string name="search_msg">Sua busca por restaurantes deve ter ao menos um parâmetro. Clique no botão superior direito para incluir ao menos um parâmetro de busca.</string>
+
+    <string name="search_cards">Procurar Cardápios</string>
+
+    <string name="single">Cardápio simples</string>
+    <string name="repeat">Cardápio fixo</string>
+    <string name="sunday">Dom</string>
+    <string name="monday">Seg</string>
+    <string name="tuesday">Ter</string>
+    <string name="wednesday">Qua</string>
+    <string name="thursday">Qui</string>
+    <string name="friday">Sex</string>
+    <string name="saturday">Sab</string>
+
+    <string name="address">Endereço:</string>
+    <string name="until">às</string>
+
+    <string name="manage_rests_msg">Clique no botão para cadastrar um restaurante.</string>
+    <string name="manage_cards_msg">Clique no botão para cadastrar um cardápio.</string>
+
+    <string name="no_results">Sem resultados.</string>
+
+</resources>

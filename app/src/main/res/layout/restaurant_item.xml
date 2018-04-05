@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:layout_width="match_parent"
+    android:layout_height="170dp"
+    android:orientation="vertical"
+    android:layout_marginLeft="8dp"
+    android:layout_marginRight="8dp"
+    android:layout_marginTop="8dp"
+    android:elevation="8dp">
+    <LinearLayout
+        android:id="@+id/routines_rv_item"
+        android:layout_width="match_parent"
+        android:layout_height="170dp"
+        android:orientation="vertical"
+        >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.95"
+        android:orientation="horizontal"
+        >
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2.1"
+        android:paddingLeft="16dp"
+        android:paddingTop="24dp"
+        android:paddingRight="16dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/name_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="2dp"
+            android:paddingRight="16dp"
+            android:text="Restaurant Name"
+            android:textColor="@color/primary_text_default_material_light"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/address_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingRight="16dp"
+            android:paddingTop="2dp"
+            android:text="Restaurant Address"
+            android:textColor="@color/secondary_text_default_material_light"
+            android:textSize="14sp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:paddingRight="16dp"
+        android:paddingTop="16dp">
+
+        <ImageView
+            android:id="@+id/image_img"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+
+    </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.95"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/edit_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/edit"
+            android:textAlignment="center"
+            android:gravity="center_vertical"
+            android:textColor="@color/bordoMain"
+            android:textAllCaps="true"
+            android:paddingRight="8dp"
+            android:paddingLeft="8dp"
+            android:textStyle="bold" />
+        <TextView
+            android:textAlignment="center"
+            android:id="@+id/manageCards_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textColor="@color/bordoMain"
+            android:text="@string/manage_cards"
+            android:paddingRight="8dp"
+            android:paddingLeft="8dp"
+            android:textAllCaps="true"
+            android:gravity="center_vertical"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+</LinearLayout>
+
+</android.support.v7.widget.CardView>
+

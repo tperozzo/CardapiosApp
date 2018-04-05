@@ -1,0 +1,153 @@
+<resources>
+    <string name="app_name">CardapiosAplicativo</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="restaurants">Restaurants area</string>
+
+    <string name="title_activity_cardy">Menu</string>
+    <string name="title_activity_user_sign_up">Sign Up</string>
+    <string name="title_activity_manage_restaurants">Manage Restaurants</string>
+    <string name="title_activity_manage_cardies">Manage Menus</string>
+    <string name="title_activity_add_edit_cardy">Add/Edit Menu</string>
+    <string name="title_activity_add_edit_restaurants">Add/Edit Restaurant</string>
+    <string name="title_activity_user_login">Login</string>
+    <string name="title_activity_scan">Search Menus</string>
+    <string name="title_activity_crop">Crop Image</string>
+    <string name="title_activity_confirm_restaurant">Confirm Restaurant</string>
+    <string name="title_activity_user_settings">Account Settings</string>
+    <string name="remove_user">Remove User</string>
+
+    <string name="sign_up">\t\t\t\tSign up</string>
+    <string name="email">E-mail</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="login">\t\t\t\tLogin</string>
+
+    <!--SCAN ACTIVITY -->
+    <string name="click_button">Click the upper right button to choose the search parameters.</string>
+    <string name="verify_connections">Verify your connection and permissions.</string>
+    <string name="none_rest">None restaurant found.</string>
+    <string name="location_fail">Location not found.\nVerify your connection and permissions.</string>
+    <string name="need_location_title">This app needs location access</string>
+    <string name="need_location_msg">Please grant location access so this app can detect near restaurants.</string>
+    <string name="need_extsd_title">This app needs memory access</string>
+    <string name="need_extsd_msg">Please grant memory access so this app saves any functional data.</string>
+    <string name="GPS_msg">GPS is disabled in your device. Would you like to enable it?</string>
+    <string name="GPS_btn">Settings</string>
+
+    <!--CARDY ACTIVITY -->
+    <string name="today_card_is">Today\'s menu is:</string>
+
+    <!--SIGN UP ACTIVITY -->
+    <string name="email_empty">Email field is empty.</string>
+    <string name="email_invalid">Invalid email.</string>
+    <string name="password_empty">Password field is empty.</string>
+    <string name="cpassword_empty">Confirm password field is empty.</string>
+    <string name="passwords_different">Passwords are different.</string>
+    <string name="user_already_exists">User already exists.</string>
+    <string name="sign_up_successful">User sign up successful.</string>
+    <string name="sign_up_failed">User sign up failed.</string>
+    <string name="password_6_char">Password must be at least 6 characters.</string>
+
+    <!--LOGIN ACTIVITY -->
+    <string name="login_failed">Login failed.</string>
+    <string name="password_invalid">Wrong password.</string>
+    <string name="login_successful">Login successful.</string>
+    <string name="user_does_not_exists">User does not exist.</string>
+
+    <!--MANAGE RESTS ACTIVITY -->
+    <string name="add">Add</string>
+    <string name="edit">Edit</string>
+    <string name="manage_cards">Manage Cards</string>
+
+    <!--CONFIRM REST ACTIVITY -->
+    <string name="rest_updated">Restaurant updated!</string>
+    <string name="rest_updated_fail">NIt was not possible update the restaurant.</string>
+    <string name="rest_created">Restaurant created!</string>
+    <string name="rest_created_fail">It was not possible create the restaurant.</string>
+    <string name="confirm_msg">    Do you confirm your restaurant\'s data?
+    \nIt will appear this way to users.</string>
+
+    <!--MANAGE CARDS ACTIVITY -->
+    <string name="remove">Remove</string>
+
+    <!--ADD EDIT RESTS ACTIVITY -->
+    <string name="name_hint">Restaurant Name</string>
+    <string name="city_hint">City</string>
+    <string name="address_hint">Address</string>
+    <string name="complement_hint">Complement(optional)</string>
+    <string name="latitude_hint">Latitude</string>
+    <string name="longitude_hint">Longitude</string>
+    <string name="invalid_address">Invalid address</string>
+    <string name="invalid_name">Invalid name</string>
+    <string name="invalid_city">Invalid city</string>
+    <string name="invalid_latitude">Invalid latitude</string>
+    <string name="invalid_longitude">Invalid longitude</string>
+    <string name="edit_coord">Edit coordinates</string>
+    <string name="crop__saving">Saving picture…</string>
+    <string name="crop__wait">Please wait…</string>
+    <string name="crop__pick_error">No image sources available</string>
+    <string name="crop__done">DONE</string>
+    <string name="crop__cancel">CANCEL</string>
+
+    <!--ADD EDIT CARDS ACTIVITY -->
+    <string name="card">Menu:</string>
+    <string name="card_date">Menu date:</string>
+    <string name="card_created">Menu created!</string>
+    <string name="card_created_fail">It was not possible create the menu.</string>
+    <string name="card_updated">Menu updated!</string>
+    <string name="card_updated_fail">It was not possible update the menu.</string>
+    <string name="card_empty">Empty menu.</string>
+    <string name="invalid_date">Invalid date.</string>
+    <string name="invalid_days">You must choose at least one day of the week.</string>
+    <string name="removed_card">Menu removed!</string>
+    <string name="removed_card_fail">It was not possible remove the menu.</string>
+    <string name="card_msg">Use this field any way you want to post your menu and, if you wish, to send a message to your prospects.</string>
+    <string name="daysOfWeek">Days of week:</string>
+
+    <!--USER SETTINGS ACTIVITY -->
+    <string name="update_user">Update user</string>
+    <string name="database_fail"> It was not possible connect to the database.</string>
+    <string name="updated_user">Updated user!</string>
+    <string name="updated_user_fail">It was not possible update the user.</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+
+    <string name="title_activity_main2">Main2Activity</string>
+
+    <string name="noconnection">No internet connection.</string>
+    <string name="rest_name">Restaurant name</string>
+    <string name="food">Desired food</string>
+    <string name="dist">Distance: </string>
+    <string name="busca">Search</string>
+    <string name="ok">OK</string>
+    <string name="cancelar">Cancel</string>
+
+    <string name="rest_name_msg">The restaurant name must have at least 3 characters.</string>
+    <string name="food_msg">The desired food must have at least 3 characters.</string>
+    <string name="city_msg">The city name must have at least 3 characters.</string>
+    <string name="search_msg">The search must have at least 1 parameter.</string>
+
+    <string name="search_cards">Search Menus</string>
+
+    <string name="single">Single menu</string>
+    <string name="repeat">Repetitive menu</string>
+    <string name="sunday">Sun</string>
+    <string name="monday">Mon</string>
+    <string name="tuesday">Tue</string>
+    <string name="wednesday">Wed</string>
+    <string name="thursday">Thu</string>
+    <string name="friday">Fri</string>
+    <string name="saturday">Sat</string>
+
+    <string name="address">Address:</string>
+    <string name="until">to</string>
+
+    <string name="manage_rests_msg">Push the button to register a restaurant.</string>
+    <string name="manage_cards_msg">Push the button to register a menu.</string>
+
+    <string name="no_results">No results.</string>
+</resources>
