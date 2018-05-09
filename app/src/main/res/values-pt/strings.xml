@@ -148,4 +148,13 @@
 
     <string name="no_results">Sem resultados.</string>
 
+    <!--MENUS -->
+    <string name="sign_up_menu">\t\t\t\tCadastrar</string>
+    <string name="login_menu">\t\t\t\tLogin</string>
+    <string name="manage_rests_menu">\t\t\t\tGerenciar Restaurantes</string>
+    <string name="user_settings_menu">\t\t\t\tConfigurações de Usuário</string>
+    <string name="logout_menu">\t\t\t\tLogout</string>
+    <string name="remove_user_menu">\t\t\t\tRemover Usuário</string>
+    <string name="search_cards_menu">\t\t\t\tProcurar Cardápios</string>​
+
 </resources>

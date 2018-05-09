@@ -4,10 +4,10 @@
         <menu>
             <item
                 android:id="@+id/nav_signup"
-                android:title="@string/sign_up" />
+                android:title="@string/sign_up_menu" />
             <item
                 android:id="@+id/nav_login"
-                android:title="@string/login" />
+                android:title="@string/login_menu" />
         </menu>
     </item>
 </menu>

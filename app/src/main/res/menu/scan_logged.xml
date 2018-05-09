@@ -4,16 +4,16 @@
         <menu>
             <item
                 android:id="@+id/nav_manage_rests"
-                android:title="@string/title_activity_manage_restaurants" />
+                android:title="@string/manage_rests_menu" />
             <item
                 android:id="@+id/nav_change_account"
-                android:title="@string/title_activity_user_settings" />
+                android:title="@string/user_settings_menu" />
             <item
                 android:id="@+id/nav_logout"
-                android:title="Logout" />
+                android:title="logout_menu" />
             <item
                 android:id="@+id/nav_delete"
-                android:title="@string/remove_user" />
+                android:title="@string/remove_user_menu" />
         </menu>
     </item>
 </menu>

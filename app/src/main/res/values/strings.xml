@@ -150,4 +150,13 @@
     <string name="manage_cards_msg">Push the button to register a menu.</string>
 
     <string name="no_results">No results.</string>
+
+    <!--MENUS -->
+    <string name="sign_up_menu">\t\t\t\tSign Up</string>
+    <string name="login_menu">\t\t\t\tLogin</string>
+    <string name="manage_rests_menu">\t\t\t\tManage Restaurants</string>
+    <string name="user_settings_menu">\t\t\t\tUser Settings</string>
+    <string name="logout_menu">\t\t\t\tLogout</string>
+    <string name="remove_user_menu">\t\t\t\tRemove User</string>
+    <string name="search_cards_menu">\t\t\t\tSearch Menus</string>​
 </resources>
