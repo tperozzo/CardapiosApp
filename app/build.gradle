@@ -38,34 +38,38 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     // Kumulos dependencies
     // Required for push notifications
     //compile 'com.google.android.gms:play-services-gcm:+'
     // Kumulos debug & release libraries
-    debugCompile(name: 'kumulos-2.4.0-debug', ext: 'aar')
-    releaseCompile(name: 'kumulos-2.4.0-release', ext: 'aar')
+    debugImplementation(name: 'kumulos-2.4.0-debug', ext: 'aar')
+    releaseImplementation(name: 'kumulos-2.4.0-release', ext: 'aar')
     //debugCompile(name: 'android-crop-debug', ext: 'aar')
     //releaseCompile(name: 'android-crop-release', ext: 'aar')
-
-
-    compile 'com.google.android.gms:play-services:10.2.0'
-    compile 'com.astuetz:pagerslidingtabstrip:1.0.1'
-    compile 'com.android.support:multidex:1.0.1'
-    compile 'com.android.support:appcompat-v7:25.2.0'
-    compile 'com.android.support:design:25.2.0'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.loopj.android:android-async-http:1.4.9'
-    compile 'org.codehaus.jackson:jackson-mapper-asl:1.8.5'
-    compile 'com.android.support:cardview-v7:25.2.0'
-    compile 'com.android.support:recyclerview-v7:25.2.0'
-    compile 'com.soundcloud.android:android-crop:1.0.1@aar'
-    compile 'com.google.android.gms:play-services-ads:10.2.0'
-    compile 'com.android.support:support-v4:25.2.0'
-    compile 'com.android.support:support-annotations:+'
-    compile 'com.google.code.gson:gson:2.8.2'
-    testCompile 'junit:junit:4.12'
+    implementation 'com.google.android.gms:play-services:10.2.0'
+    implementation 'com.astuetz:pagerslidingtabstrip:1.0.1'
+    implementation 'com.android.support:multidex:1.0.1'
+    implementation 'com.android.support:appcompat-v7:25.2.0'
+    implementation 'com.android.support:design:25.2.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.loopj.android:android-async-http:1.4.9'
+    implementation 'org.codehaus.jackson:jackson-mapper-asl:1.8.5'
+    implementation 'com.android.support:cardview-v7:25.2.0'
+    implementation 'com.android.support:recyclerview-v7:25.2.0'
+    implementation 'com.soundcloud.android:android-crop:1.0.1@aar'
+    implementation 'com.google.android.gms:play-services-ads:10.2.0'
+    implementation 'com.android.support:support-v4:25.2.0'
+    implementation 'com.android.support:support-annotations:+'
+    implementation 'com.google.code.gson:gson:2.8.2'
+    testImplementation 'junit:junit:4.12'
+    implementation 'com.google.code.gson:gson:2.8.2'
+    implementation 'org.json:json:20180130'
+    implementation 'com.androidhuman.rxfirebase2:firebase-core:11.8.0.1'
 }
+
+
+apply plugin: 'com.google.gms.google-services'

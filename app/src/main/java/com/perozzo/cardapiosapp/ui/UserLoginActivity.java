@@ -1,13 +1,16 @@
 package com.perozzo.cardapiosapp.ui;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -27,6 +30,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 import com.kumulos.android.Kumulos;
 import com.kumulos.android.ResponseHandler;
 import com.perozzo.cardapiosapp.R;
@@ -53,6 +60,8 @@ public class UserLoginActivity extends AppCompatActivity {
     public int getUserError = 0;
     public int loginError = 0;
 
+    private FirebaseAuth mAuth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +70,7 @@ public class UserLoginActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getWindow().setBackgroundDrawable(null);
 
+        mAuth = FirebaseAuth.getInstance();
         sharedPrefSettings = getSharedPreferences("CARDAPIOSAPP", 0);
         ctx = this;
 
@@ -72,6 +82,7 @@ public class UserLoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(isOnline()) {
                     doLogin();
+
                 }
                 else{
                     Toast.makeText(getApplicationContext(), getString(R.string.noconnection), Toast.LENGTH_SHORT).show();
@@ -91,7 +102,8 @@ public class UserLoginActivity extends AppCompatActivity {
         verifyFields();
         if(emailOk && passwordOk) {
             ProgressDialog();
-            searchUserOnDataBase();
+            //searchUserOnDataBase();
+            LoginFirebase();
         }
     }
 
@@ -122,47 +134,6 @@ public class UserLoginActivity extends AppCompatActivity {
             Toast.makeText(ctx, getString(R.string.password_empty), Toast.LENGTH_LONG).show();
             return;
         }
-
-
-    }
-
-    public void searchUserOnDataBase(){
-        //2 - ver se o usuario nao existe
-        if(emailOk && passwordOk) {
-            HashMap<String, String> params1 = new HashMap<String, String>();
-            params1.put("email", email_et.getText().toString());
-            Kumulos.call("getUser", params1, new ResponseHandler() {
-                @Override
-                public void onFailure(@Nullable Throwable error) {
-                    getUserError++;
-                    if(getUserError >= 3){
-                        getUserError = 0;
-                        progressDialog.dismiss();
-                        Toast.makeText(ctx, getString(R.string.database_fail), Toast.LENGTH_LONG).show();
-                        return;
-                    }
-                    else{
-                        searchUserOnDataBase();
-                    }
-                    super.onFailure(error);
-                }
-
-                @Override
-                public void didCompleteWithResult(Object result) {
-                    super.didCompleteWithResult(result);
-                    ArrayList<LinkedHashMap<String, Object>> objects = (ArrayList<LinkedHashMap<String, Object>>) result;
-                    if (!objects.isEmpty()) {
-                        getUserOk = true;
-                        login();
-                    }
-                    else {
-                        progressDialog.dismiss();
-                        Toast.makeText(ctx, getString(R.string.user_does_not_exists), Toast.LENGTH_LONG).show();
-                        return;
-                    }
-                }
-            });
-        }
     }
 
     public void ProgressDialog(){
@@ -174,54 +145,51 @@ public class UserLoginActivity extends AppCompatActivity {
         progressDialog.setIndeterminate(true);
     }
 
-    public void login(){
-        if(getUserOk){
-            HashMap<String, String> params1 = new HashMap<String, String>();
-            params1.put("email", email);
-            params1.put("password", password);
-            Kumulos.call("login", params1, new ResponseHandler() {
-                @Override
-                public void onFailure(@Nullable Throwable error) {
-                    loginError++;
-                    if(loginError >= 3){
-                        loginError = 0;
-                        progressDialog.dismiss();
-                        Toast.makeText(ctx, getString(R.string.database_fail), Toast.LENGTH_LONG).show();
-                        return;
-                    }
-                    else{
-                        login();
-                    }
-                    super.onFailure(error);
-                }
+    public void LoginFirebase(){
 
-                @Override
-                public void didCompleteWithResult(Object result) {
-                    super.didCompleteWithResult(result);
-                    ArrayList<LinkedHashMap<String, Object>> objects = (ArrayList<LinkedHashMap<String,Object>>) result;
-                    if (!objects.isEmpty()) {
-                        Toast.makeText(ctx, getString(R.string.login_successful), Toast.LENGTH_LONG).show();
-                        progressDialog.dismiss();
-                        invalidateOptionsMenu();
-                        int ID = (int)objects.get(0).get("userID");
-                        Intent i = new Intent(UserLoginActivity.this, ManageRestaurantsActivity.class);
-                        i.putExtra("owner",String.valueOf(ID));
-                        i.putExtra("EMAIL", email);
-                        i.putExtra("PASSWORD", password);
 
+        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                progressDialog.dismiss();
+                if (task.isSuccessful()) {
+                    if(mAuth.getCurrentUser().isEmailVerified()){
                         SaveCredentials();
-
-                        startActivity(i);
+                        Intent intent = new Intent(UserLoginActivity.this, ManageRestaurantsActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
                         finish();
                     }
-                    else {
-                        progressDialog.dismiss();
-                        Toast.makeText(ctx, getString(R.string.password_invalid), Toast.LENGTH_LONG).show();
-                        return;
+                    else{
+                        verifyEmailDialog();
                     }
+
+                } else {
+                    Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 }
-            });
-        }
+            }
+        });
+    }
+
+    public void verifyEmailDialog(){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getString(R.string.validate_email_msg))
+                .setCancelable(false)
+                .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        mAuth.getCurrentUser().sendEmailVerification();
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     @Override

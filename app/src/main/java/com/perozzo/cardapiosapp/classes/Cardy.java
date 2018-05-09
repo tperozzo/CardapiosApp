@@ -1,5 +1,7 @@
 package com.perozzo.cardapiosapp.classes;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -9,8 +11,16 @@ import java.util.List;
  */
 
 public class Cardy implements Serializable{
-    public Date day;
-    public String ID;
-    public String foods;
+
+    @SerializedName("date")
+    public Date date;
+
+    @SerializedName("cardID")
+    public String cardID;
+
+    @SerializedName("card")
+    public String card;
+
+    @SerializedName("daysOfWeek")
     public String daysOfWeek = "";
 }

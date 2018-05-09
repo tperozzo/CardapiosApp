@@ -47,12 +47,15 @@
     <string name="cpassword_empty">Campo de confirmar senha está vazio.</string>
     <string name="passwords_different">Senhas são diferentes.</string>
     <string name="user_already_exists">Usuário já existe.</string>
-    <string name="sign_up_successful">Cadastro de usuário realizado com sucesso.</string>
+    <string name="sign_up_successful">Cadastro de usuário realizado com sucesso. \n Por favor, verifique seu email.</string>
     <string name="sign_up_failed">Cadastro de usuário falhou.</string>
     <string name="password_6_char">Senha deve ter no mínimo 6 caracteres.</string>
 
     <!--LOGIN ACTIVITY -->
     <string name="login_failed">Login falhou.</string>
+    <string name="validate_email_msg">Seu email não foi validado. \n Deseja receber email de validação?</string>
+    <string name="yes">SIM</string>
+    <string name="no">NÃO</string>
     <string name="password_invalid">Senha incorreta.</string>
     <string name="login_successful">Login realizado com sucesso.</string>
     <string name="user_does_not_exists">Usuário não existe.</string>

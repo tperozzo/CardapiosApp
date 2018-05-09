@@ -47,7 +47,7 @@
     <string name="cpassword_empty">Confirm password field is empty.</string>
     <string name="passwords_different">Passwords are different.</string>
     <string name="user_already_exists">User already exists.</string>
-    <string name="sign_up_successful">User sign up successful.</string>
+    <string name="sign_up_successful">User sign up successful.\n Please verify your email.</string>
     <string name="sign_up_failed">User sign up failed.</string>
     <string name="password_6_char">Password must be at least 6 characters.</string>
 

@@ -22,7 +22,6 @@ import android.support.v7.widget.Toolbar;
 import android.widget.CalendarView;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -493,7 +492,7 @@ public class AddEditCardActivity extends AppCompatActivity {
             cv.setLayoutParams(layoutParams);
 
             SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-            String dateString = df.format(c.day);
+            String dateString = df.format(c.date);
             try {
                 now = new Date(df.parse(nowString).getTime());
                 data = new Date(df.parse(dateString).getTime());
@@ -501,7 +500,7 @@ public class AddEditCardActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
             date_et.setText(dateString);
-            foods_et.setText(c.foods);
+            foods_et.setText(c.card);
         }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -698,7 +697,7 @@ public class AddEditCardActivity extends AppCompatActivity {
             params2.put("date", String.valueOf(data.getTime() / 1000));
         else
             params2.put("daysOfWeek", c.daysOfWeek);
-        params2.put("cardID", c.ID);
+        params2.put("cardID", c.cardID);
         Kumulos.call("updateCard", params2, new ResponseHandler() {
             @Override
             public void onFailure(@Nullable Throwable error) {
@@ -739,7 +738,7 @@ public class AddEditCardActivity extends AppCompatActivity {
         //delete card
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("restaurant", restaurantID);
-        params.put("cardID", c.ID);
+        params.put("cardID", c.cardID);
         Kumulos.call("removeCard", params, new ResponseHandler() {
             @Override
             public void onFailure(@Nullable Throwable error) {

@@ -56,6 +56,8 @@ import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.gson.Gson;
 import com.kumulos.android.Kumulos;
 import com.kumulos.android.ResponseHandler;
 import com.perozzo.cardapiosapp.R;
@@ -85,7 +87,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
 
     public boolean isLogged = false;
     public Context ctx;
-    public String email, password, userID;
+    public String userID;
     private SharedPreferences sharedPrefSettings;
 
     public GoogleApiClient mGoogleApiClient;
@@ -104,6 +106,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
     public Intent i;
     Toolbar toolbar;
 
+    public FirebaseAuth mAuth;
+
     public RecyclerView results_rv;
     public LinearLayout logoLayout;
     public ArrayList<Searcheds> resultsList;
@@ -118,7 +122,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getWindow().setBackgroundDrawable(null);
-
+        mAuth = FirebaseAuth.getInstance();
         LocationPermission();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -134,11 +138,15 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
         firstUse = sharedPrefSettings.getBoolean("firstUse", true);
 
         ctx = this;
-        email = getSetting("EMAIL", "");
-        password = getSetting("PASSWORD", "");
 
-        userID = getIntent().getStringExtra("owner");
-        isLogged = getIntent().getBooleanExtra("logged", false);
+        if(mAuth.getCurrentUser() != null) {
+            userID = mAuth.getCurrentUser().getUid();
+            isLogged = true;
+        }
+        else{
+            userID = "";
+            isLogged = false;
+        }
         MakeDrawer();
 
 
@@ -607,50 +615,6 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
         dialog.show();
     }
 
-    public void login() {
-        HashMap<String, String> params1 = new HashMap<String, String>();
-        params1.put("email", email);
-        params1.put("password", password);
-        Kumulos.call("login", params1, new ResponseHandler() {
-            @Override
-            public void onFailure(@Nullable Throwable error) {
-                //  Log.v("LOGINERROR",String.valueOf(loginError));
-                loginError++;
-                if(loginError >= 2){
-                    loginError = 0;
-                    progressDialog.dismiss();
-                    MakeDrawer();
-                    return;
-                }
-                else{
-                    login();
-                }
-                super.onFailure(error);
-                return;
-            }
-
-            @Override
-            public void didFailWithError(String message) {
-                Log.v("LOGINERROR","FAIL");
-                super.didFailWithError(message);
-
-            }
-
-            @Override
-            public void didCompleteWithResult(Object result) {
-                super.didCompleteWithResult(result);
-                ArrayList<LinkedHashMap<String, Object>> objects = (ArrayList<LinkedHashMap<String, Object>>) result;
-                if (!objects.isEmpty()) {
-                    invalidateOptionsMenu();
-                    int ID = (int) objects.get(0).get("userID");
-                    isLogged = true;
-                }
-                progressDialog.dismiss();
-                MakeDrawer();
-            }
-        });
-    }
-
     public void MakeDrawer() {
 
         invalidateOptionsMenu();
@@ -771,9 +735,6 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
             startActivity(i);
         } else if (id == R.id.nav_manage_rests) {
             Intent i = new Intent(Main2Activity.this, ManageRestaurantsActivity.class);
-            i.putExtra("owner", userID);
-            i.putExtra("EMAIL", email);
-            i.putExtra("PASSWORD", password);
             startActivity(i);
             finish();
         } else if (id == R.id.nav_logout) {
@@ -781,9 +742,6 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
             MakeDrawer();
         }else if(id == R.id.nav_change_account){
             Intent i = new Intent(Main2Activity.this, UserSettings.class);
-            i.putExtra("EMAIL",email);
-            i.putExtra("PASSWORD",password);
-            i.putExtra("owner",userID);
             startActivity(i);
         }
         else if(id == R.id.nav_delete){
@@ -837,10 +795,11 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
 
     }
 
+    //TODO
     public void deleteUser(){
         HashMap<String, String> params = new HashMap<String, String>();
-        params.put("email", email);
-        params.put("password", password);
+        //params.put("email", email);
+        //params.put("password", password);
         Kumulos.call("removeUser", params, new ResponseHandler(){
             @Override
             public void onFailure(@Nullable Throwable error) {
@@ -894,6 +853,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
     }
 
     public void LogOut() {
+        FirebaseAuth.getInstance().signOut();
         isLogged = false;
         setSetting("EMAIL", "");
         setSetting("PASSWORD", "");
@@ -1101,11 +1061,15 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
+                                    Gson gson = new Gson();
+                                    String json = gson.toJson(restaurantMap);
+                                    s.r = gson.fromJson(json, Restaurant.class);
+                                    /*
                                     s.r.telephone = String.valueOf(restaurantMap.get("telephone"));
                                     s.r.openTime = String.valueOf(restaurantMap.get("openTime"));
                                     s.r.closeTime = String.valueOf(restaurantMap.get("closeTime"));
@@ -1116,7 +1080,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     s.r.latitude = Double.parseDouble(String.valueOf(restaurantMap.get("latitude")));
                                     s.r.longitude = Double.parseDouble(String.valueOf(restaurantMap.get("longitude")));
                                     s.r.icon = String.valueOf(restaurantMap.get("icon"));
-
+                                    */
                                     s.distance = CalcDistance(s.r.latitude, s.r.longitude);
 
                                     resultsList.add(s);
@@ -1143,8 +1107,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                         Searcheds s = new Searcheds();
 
                         s.c = new Cardy();
-                        s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                        s.c.foods = String.valueOf(objects.get(i).get("card"));
+                        s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                        s.c.card = String.valueOf(objects.get(i).get("card"));
 
                         s.r = new Restaurant();
                         LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -1218,8 +1182,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -1339,8 +1303,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -1381,8 +1345,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                         Searcheds s = new Searcheds();
 
                         s.c = new Cardy();
-                        s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                        s.c.foods = String.valueOf(objects.get(i).get("card"));
+                        s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                        s.c.card = String.valueOf(objects.get(i).get("card"));
 
                         s.r = new Restaurant();
                         LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -1456,8 +1420,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -1577,8 +1541,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -1619,8 +1583,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                         Searcheds s = new Searcheds();
 
                         s.c = new Cardy();
-                        s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                        s.c.foods = String.valueOf(objects.get(i).get("card"));
+                        s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                        s.c.card = String.valueOf(objects.get(i).get("card"));
 
                         s.r = new Restaurant();
                         LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -1694,8 +1658,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -1823,8 +1787,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -1865,8 +1829,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                         Searcheds s = new Searcheds();
 
                         s.c = new Cardy();
-                        s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                        s.c.foods = String.valueOf(objects.get(i).get("card"));
+                        s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                        s.c.card = String.valueOf(objects.get(i).get("card"));
 
                         s.r = new Restaurant();
                         LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -1943,8 +1907,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -2066,8 +2030,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -2108,8 +2072,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                         Searcheds s = new Searcheds();
 
                         s.c = new Cardy();
-                        s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                        s.c.foods = String.valueOf(objects.get(i).get("card"));
+                        s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                        s.c.card = String.valueOf(objects.get(i).get("card"));
 
                         s.r = new Restaurant();
                         LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -2184,8 +2148,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -2307,8 +2271,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -2349,8 +2313,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                         Searcheds s = new Searcheds();
 
                         s.c = new Cardy();
-                        s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                        s.c.foods = String.valueOf(objects.get(i).get("card"));
+                        s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                        s.c.card = String.valueOf(objects.get(i).get("card"));
 
                         s.r = new Restaurant();
                         LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -2425,8 +2389,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -2555,8 +2519,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -2597,8 +2561,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                         Searcheds s = new Searcheds();
 
                         s.c = new Cardy();
-                        s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                        s.c.foods = String.valueOf(objects.get(i).get("card"));
+                        s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                        s.c.card = String.valueOf(objects.get(i).get("card"));
 
                         s.r = new Restaurant();
                         LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -2676,8 +2640,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -2799,8 +2763,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -2841,8 +2805,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                         Searcheds s = new Searcheds();
 
                         s.c = new Cardy();
-                        s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                        s.c.foods = String.valueOf(objects.get(i).get("card"));
+                        s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                        s.c.card = String.valueOf(objects.get(i).get("card"));
 
                         s.r = new Restaurant();
                         LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -2917,8 +2881,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -3047,8 +3011,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -3089,8 +3053,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                         Searcheds s = new Searcheds();
 
                         s.c = new Cardy();
-                        s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                        s.c.foods = String.valueOf(objects.get(i).get("card"));
+                        s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                        s.c.card = String.valueOf(objects.get(i).get("card"));
 
                         s.r = new Restaurant();
                         LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -3168,8 +3132,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -3298,8 +3262,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -3340,8 +3304,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                         Searcheds s = new Searcheds();
 
                         s.c = new Cardy();
-                        s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                        s.c.foods = String.valueOf(objects.get(i).get("card"));
+                        s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                        s.c.card = String.valueOf(objects.get(i).get("card"));
 
                         s.r = new Restaurant();
                         LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -3419,8 +3383,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -3544,8 +3508,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -3586,8 +3550,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                         Searcheds s = new Searcheds();
 
                         s.c = new Cardy();
-                        s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                        s.c.foods = String.valueOf(objects.get(i).get("card"));
+                        s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                        s.c.card = String.valueOf(objects.get(i).get("card"));
 
                         s.r = new Restaurant();
                         LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -3663,8 +3627,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -3795,8 +3759,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -3837,8 +3801,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                         Searcheds s = new Searcheds();
 
                         s.c = new Cardy();
-                        s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                        s.c.foods = String.valueOf(objects.get(i).get("card"));
+                        s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                        s.c.card = String.valueOf(objects.get(i).get("card"));
 
                         s.r = new Restaurant();
                         LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -3917,8 +3881,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -4049,8 +4013,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -4091,8 +4055,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                         Searcheds s = new Searcheds();
 
                         s.c = new Cardy();
-                        s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                        s.c.foods = String.valueOf(objects.get(i).get("card"));
+                        s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                        s.c.card = String.valueOf(objects.get(i).get("card"));
 
                         s.r = new Restaurant();
                         LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -4171,8 +4135,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -4303,8 +4267,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -4345,8 +4309,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                         Searcheds s = new Searcheds();
 
                         s.c = new Cardy();
-                        s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                        s.c.foods = String.valueOf(objects.get(i).get("card"));
+                        s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                        s.c.card = String.valueOf(objects.get(i).get("card"));
 
                         s.r = new Restaurant();
                         LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -4425,8 +4389,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -4559,8 +4523,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -4601,8 +4565,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                         Searcheds s = new Searcheds();
 
                         s.c = new Cardy();
-                        s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                        s.c.foods = String.valueOf(objects.get(i).get("card"));
+                        s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                        s.c.card = String.valueOf(objects.get(i).get("card"));
 
                         s.r = new Restaurant();
                         LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -4682,8 +4646,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                                     Searcheds s = new Searcheds();
 
                                     s.c = new Cardy();
-                                    s.c.ID = String.valueOf(objects.get(i).get("cardID"));
-                                    s.c.foods = String.valueOf(objects.get(i).get("card"));
+                                    s.c.cardID = String.valueOf(objects.get(i).get("cardID"));
+                                    s.c.card = String.valueOf(objects.get(i).get("card"));
 
                                     s.r = new Restaurant();
                                     LinkedHashMap<String, Object> restaurantMap = (LinkedHashMap<String, Object>)objects.get(i).get("restaurant");
@@ -4784,7 +4748,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                     @Override
                     public void onClick(View v) {
                         i = new Intent(ctx, CardActivity.class);
-                        i.putExtra("CARD", mList.get(getAdapterPosition()).c.foods);
+                        i.putExtra("CARD", mList.get(getAdapterPosition()).c.card);
                         i.putExtra("REST", mList.get(getAdapterPosition()).r.name);
                         i.putExtra("ADDRESS", mList.get(getAdapterPosition()).r.fullAddr);
                         i.putExtra("LATITUDE", String.valueOf(mList.get(getAdapterPosition()).r.latitude));

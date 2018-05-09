@@ -1,6 +1,7 @@
 package com.perozzo.cardapiosapp.ui;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -36,6 +37,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.kumulos.android.Kumulos;
@@ -57,9 +59,7 @@ public class ManageRestaurantsActivity extends AppCompatActivity
     public FloatingActionButton fab;
 
     public Context ctx;
-
-    public String email;
-    public String password;
+    FirebaseAuth mAuth;
     public String userID;
 
     public List<Restaurant> restaurantsList;
@@ -76,7 +76,7 @@ public class ManageRestaurantsActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getWindow().setBackgroundDrawable(null);
-
+        mAuth = FirebaseAuth.getInstance();
         ctx = this;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -96,11 +96,6 @@ public class ManageRestaurantsActivity extends AppCompatActivity
 
         sharedPrefSettings = getSharedPreferences("CARDAPIOSAPP", 0);
 
-        intent = getIntent();
-        email = intent.getStringExtra("EMAIL");
-        password = intent.getStringExtra("PASSWORD");
-        userID = intent.getStringExtra("owner");
-
         refresh_srl = (SwipeRefreshLayout) findViewById(R.id.refresh_srl);
         refresh_srl.setColorSchemeResources(R.color.bordoMain);
         refresh_srl.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -117,9 +112,6 @@ public class ManageRestaurantsActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(ManageRestaurantsActivity.this, AddEditRestaurantsActivity.class);
-                i.putExtra("owner",userID);
-                i.putExtra("EMAIL",email);
-                i.putExtra("PASSWORD",password);
                 startActivity(i);
             }
         });
@@ -140,9 +132,10 @@ public class ManageRestaurantsActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         intent = getIntent();
-        email = intent.getStringExtra("EMAIL");
-        password = intent.getStringExtra("PASSWORD");
-        userID = intent.getStringExtra("owner");
+
+        if(mAuth.getCurrentUser() != null) {
+            userID = mAuth.getCurrentUser().getUid();
+        }
         restaurantsList = new ArrayList<>();
         restaurants_rv = (RecyclerView) findViewById(R.id.restaurants_rv);
 
@@ -150,8 +143,6 @@ public class ManageRestaurantsActivity extends AppCompatActivity
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         restaurants_rv.setLayoutManager(llm);
 
-        //progressBar.getIndeterminateDrawable().setColorFilter(getResources().getColor(R.color.bordoMain), android.graphics.PorterDuff.Mode.MULTIPLY);
-        //restaurants_rv.getRecycledViewPool().clear();
         if(isOnline()) {
             getRestaurants();
         }
@@ -187,7 +178,6 @@ public class ManageRestaurantsActivity extends AppCompatActivity
         header_tv.setVisibility(View.GONE);
         refresh_srl.setRefreshing(true);
         HashMap<String, String> params1 = new HashMap<String, String>();
-        Log.v("USERID",userID);
         params1.put("owner", userID); //owner
         Kumulos.call("getRestaurants",params1, new ResponseHandler() {
             @Override
@@ -218,27 +208,10 @@ public class ManageRestaurantsActivity extends AppCompatActivity
 
                 for(int i = 0; i < objects.size(); i++){
                     Restaurant r = new Restaurant();
-                    /*Gson gson = new Gson();
-                    r = gson.fromJson((objects.get(i).toString()), Restaurant.class);
-                    */
-                    r.name = String.valueOf(objects.get(i).get("name"));
-                    r.telephone = String.valueOf(objects.get(i).get("telephone"));
-                    r.openTime = String.valueOf(objects.get(i).get("openTime"));
-                    r.closeTime = String.valueOf(objects.get(i).get("closeTime"));
-                    r.fullAddr = String.valueOf(objects.get(i).get("fullAddr"));
-                    r.addr = String.valueOf(objects.get(i).get("addr"));
-                    r.byCoords = String.valueOf(objects.get(i).get("byCoords"));
-                    r.longitude = Double.parseDouble(String.valueOf(objects.get(i).get("longitude")));
-                    r.latitude = Double.parseDouble(String.valueOf(objects.get(i).get("latitude")));
-                    r.city = String.valueOf(objects.get(i).get("city"));
-                    r.compl = String.valueOf(objects.get(i).get("compl"));
-                    r.restaurantID = String.valueOf(objects.get(i).get("restaurantID"));
-                    r.owner = String.valueOf(objects.get(i).get("owner"));
-                    r.icon = String.valueOf(objects.get(i).get("icon"));
-
+                    Gson gson = new Gson();
+                    String json = gson.toJson(objects.get(i));
+                    r = gson.fromJson(json, Restaurant.class);
                     restaurantsList.add(r);
-
-
                 }
                 restaurantsAdapter = new RestaurantsAdapter(ctx,restaurantsList);
                 restaurants_rv.setAdapter(restaurantsAdapter);
@@ -274,28 +247,22 @@ public class ManageRestaurantsActivity extends AppCompatActivity
         if (id == R.id.nav_scan) {
             invalidateOptionsMenu();
             Intent i = new Intent(ManageRestaurantsActivity.this, Main2Activity.class);
-            i.putExtra("EMAIL",email);
-            i.putExtra("PASSWORD",password);
-            i.putExtra("owner", userID);
-            i.putExtra("logged", true);
             startActivity(i);
             finish();
         } else if (id == R.id.nav_logout) {
             invalidateOptionsMenu();
             LogOut();
             Intent i = new Intent(ManageRestaurantsActivity.this, Main2Activity.class);
-            i.putExtra("logged", false);
             startActivity(i);
             finish();
         } else if(id == R.id.nav_change_account){
+            //TODO
             invalidateOptionsMenu();
             Intent i = new Intent(ManageRestaurantsActivity.this, UserSettings.class);
-            i.putExtra("EMAIL",email);
-            i.putExtra("PASSWORD",password);
-            i.putExtra("owner",userID);
             startActivity(i);
         }
         else if(id == R.id.nav_delete){
+
             ShowDeleteConfirmDialog();
         }
 
@@ -306,9 +273,10 @@ public class ManageRestaurantsActivity extends AppCompatActivity
 
     AlertDialog dialog;
     public void ShowDeleteConfirmDialog(){
+        //TODO
         AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
         builder.setMessage("Tem certeza que deseja excluir o usuário?")
-                .setTitle("Deletar Cardápio");
+                .setTitle("Deletar Usuário");
 
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
@@ -342,8 +310,7 @@ public class ManageRestaurantsActivity extends AppCompatActivity
 
     public void deleteUser(){
         HashMap<String, String> params = new HashMap<String, String>();
-        params.put("email", email);
-        params.put("password", password);
+        //TODO
         Kumulos.call("removeUser", params, new ResponseHandler(){
             @Override
             public void onFailure(@Nullable Throwable error) {
@@ -389,7 +356,6 @@ public class ManageRestaurantsActivity extends AppCompatActivity
                 progressDialog.dismiss();
                 LogOut();
                 Intent i = new Intent(ManageRestaurantsActivity.this, Main2Activity.class);
-                i.putExtra("logged", false);
                 startActivity(i);
                 finish();
                 super.didCompleteWithResult(result);
@@ -415,6 +381,7 @@ public class ManageRestaurantsActivity extends AppCompatActivity
     }
 
     public void LogOut(){
+        FirebaseAuth.getInstance().signOut();
         setSetting("EMAIL", "");
         setSetting("PASSWORD", "");
     }
@@ -432,11 +399,8 @@ public class ManageRestaurantsActivity extends AppCompatActivity
 
         public void clear() {
             int size = this.mList.size();
-            Log.v("LISTA", String.valueOf(size));
             this.mList.clear();
-            Log.v("LISTA", String.valueOf(size));
             this.notifyDataSetChanged();
-            Log.v("LISTA", String.valueOf(size));
         }
 
         @Override
@@ -493,9 +457,6 @@ public class ManageRestaurantsActivity extends AppCompatActivity
                         i.putExtra("Restaurant",restaurantsList.get(getAdapterPosition()));
                         SavePictureData(restaurantsList.get(getAdapterPosition()).icon);
                         restaurantsList.get(getAdapterPosition()).icon = "";
-                        i.putExtra("owner",userID);
-                        i.putExtra("EMAIL",email);
-                        i.putExtra("PASSWORD",password);
                         startActivity(i);
                     }
                 });
@@ -505,9 +466,6 @@ public class ManageRestaurantsActivity extends AppCompatActivity
                     public void onClick(View v) {
                         Intent i = new Intent(ManageRestaurantsActivity.this, ManageCardsActivity.class);
                         i.putExtra("restaurantID",restaurantsList.get(getAdapterPosition()).restaurantID);
-                        i.putExtra("owner",userID);
-                        i.putExtra("EMAIL",email);
-                        i.putExtra("PASSWORD",password);
                         i.putExtra("LATITUDE", restaurantsList.get(getAdapterPosition()).latitude);
                         i.putExtra("LONGITUDE", restaurantsList.get(getAdapterPosition()).longitude);
                         i.putExtra("NAME", restaurantsList.get(getAdapterPosition()).name);

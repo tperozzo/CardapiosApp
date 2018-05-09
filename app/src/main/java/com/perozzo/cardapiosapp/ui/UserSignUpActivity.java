@@ -8,6 +8,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -29,10 +30,17 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.gms.vision.text.Text;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseUser;
 import com.kumulos.android.Kumulos;
 import com.kumulos.android.ResponseHandler;
 import com.perozzo.cardapiosapp.R;
+import com.perozzo.cardapiosapp.classes.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,6 +66,8 @@ public class UserSignUpActivity extends AppCompatActivity{
 
     private SharedPreferences sharedPrefSettings;
     public ProgressDialog progressDialog;
+
+    public FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +95,8 @@ public class UserSignUpActivity extends AppCompatActivity{
                 }
             }
         });
+
+        mAuth = FirebaseAuth.getInstance();
     }
 
     public boolean isOnline() {
@@ -98,7 +110,8 @@ public class UserSignUpActivity extends AppCompatActivity{
         validadeFields();
         if(emailOk && passwordsOk) {
             ProgressDialog();
-            searchUserOnDataBase();
+            //searchUserOnDataBase();
+            SignUpFirebase();
         }
     }
 
@@ -247,13 +260,39 @@ public class UserSignUpActivity extends AppCompatActivity{
         }
     }
 
+    public void SignUpFirebase(){
+        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    Toast.makeText(ctx, getString(R.string.sign_up_successful), Toast.LENGTH_LONG).show();
+                    progressDialog.dismiss();
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    user.sendEmailVerification();
+                    invalidateOptionsMenu();
+                    SaveCredentials();
+                    finish();
+                } else {
+
+                    if (task.getException() instanceof FirebaseAuthUserCollisionException) {
+                        Toast.makeText(getApplicationContext(), getString(R.string.user_already_exists), Toast.LENGTH_SHORT).show();
+
+                    } else {
+                        Toast.makeText(getApplicationContext(), getString(R.string.sign_up_failed), Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+            }
+        });
+    }
+
     private void setSetting(String tag, String value) {
         try {
             SharedPreferences.Editor editor = sharedPrefSettings.edit();
             editor.putString(tag, value);
             editor.commit();
         } catch (Exception e) {
-            Log.v("CardapiosApp", "err:"+e.getMessage());
+            Log.v("CardapiosApp", "err: " + e.getMessage());
         }
     }
 

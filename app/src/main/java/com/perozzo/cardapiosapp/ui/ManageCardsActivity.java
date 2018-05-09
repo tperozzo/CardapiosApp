@@ -12,7 +12,6 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,24 +24,19 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.kumulos.android.Kumulos;
 import com.kumulos.android.ResponseHandler;
 import com.perozzo.cardapiosapp.R;
 import com.perozzo.cardapiosapp.classes.Cardy;
-import com.perozzo.cardapiosapp.classes.Restaurant;
-import com.perozzo.cardapiosapp.classes.Searcheds;
 import com.perozzo.cardapiosapp.components.SimpleDividerItemDecorationCardies;
 
-import java.security.PublicKey;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -75,8 +69,6 @@ public class ManageCardsActivity extends AppCompatActivity
     public String restaurantID;
     public String name;
     public String city;
-    public String login;
-    public String password;
     public double latitude, longitude;
     public Context ctx;
 
@@ -89,6 +81,9 @@ public class ManageCardsActivity extends AppCompatActivity
     public int removeCardByDateError = 0;
     public TextView header_tv;
     public Cardy c;
+
+    public FirebaseAuth mAuth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,6 +91,7 @@ public class ManageCardsActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getWindow().setBackgroundDrawable(null);
+        mAuth = FirebaseAuth.getInstance();
 
         refresh_srl = (SwipeRefreshLayout) findViewById(R.id.refresh_srl);
         refresh_srl.setColorSchemeResources(R.color.bordoMain);
@@ -106,9 +102,7 @@ public class ManageCardsActivity extends AppCompatActivity
 
         final Intent intent = getIntent();
         restaurantID = intent.getStringExtra("restaurantID");
-        login = intent.getStringExtra("EMAIL");
-        password = intent.getStringExtra("PASSWORD");
-        userID = intent.getStringExtra("owner");
+        userID = mAuth.getCurrentUser().getUid();
         latitude = intent.getDoubleExtra("LATITUDE", 0);
         longitude = intent.getDoubleExtra("LONGITUDE", 0);
         name = intent.getStringExtra("NAME");
@@ -166,7 +160,6 @@ public class ManageCardsActivity extends AppCompatActivity
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         cards_rv.setLayoutManager(llm);
 
-
         if(isOnline()) {
             getCards();
         }
@@ -219,11 +212,11 @@ public class ManageCardsActivity extends AppCompatActivity
 
                 for(int i = 0; i < objects.size(); i++){
                     c = new Cardy();
-                    c.ID = String.valueOf(objects.get(i).get("cardID"));
+                    c.cardID = String.valueOf(objects.get(i).get("cardID"));
                     if(objects.get(i).get("daysOfWeek").equals("")) {
                         String dateString = String.valueOf(objects.get(i).get("date")).substring(0, 10);
                         try {
-                            c.day = new Date(format.parse(dateString).getTime());
+                            c.date = new Date(format.parse(dateString).getTime());
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }
@@ -240,10 +233,10 @@ public class ManageCardsActivity extends AppCompatActivity
                             e.printStackTrace();
                         }
 
-                        if (c.day.getTime() < now.getTime()) {
+                        if (c.date.getTime() < now.getTime()) {
                             removeCardByDate();
                         } else {
-                            c.foods = String.valueOf(objects.get(i).get("card"));
+                            c.card = String.valueOf(objects.get(i).get("card"));
                             cardsList.add(c);
                         }
                     }
@@ -251,18 +244,18 @@ public class ManageCardsActivity extends AppCompatActivity
                         //TODO card daysofweek
                         String dateString = "1970-01-01";
                         try {
-                            c.day = new Date(format.parse(dateString).getTime());
+                            c.date = new Date(format.parse(dateString).getTime());
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }
                         c.daysOfWeek = String.valueOf(objects.get(i).get("daysOfWeek"));
-                        c.foods = String.valueOf(objects.get(i).get("card"));
+                        c.card = String.valueOf(objects.get(i).get("card"));
                         cardsList.add(c);
                     }
 
                     Collections.sort(cardsList, new Comparator<Cardy>() {
                         @Override public int compare(Cardy bo1, Cardy bo2) {
-                            return (bo1.day.getTime() >  bo2.day.getTime() ? 1:-1);
+                            return (bo1.date.getTime() >  bo2.date.getTime() ? 1:-1);
                         }
                     });
                 }
@@ -279,7 +272,7 @@ public class ManageCardsActivity extends AppCompatActivity
     public void removeCardByDate(){
         HashMap<String, String> params2 = new HashMap<String, String>();
         params2.put("restaurant", restaurantID);
-        params2.put("cardID", c.ID);
+        params2.put("cardID", c.cardID);
         Kumulos.call("removeCardByDate", params2, new ResponseHandler(){
             @Override
             public void onFailure(@Nullable Throwable error) {
@@ -342,29 +335,19 @@ public class ManageCardsActivity extends AppCompatActivity
 
         if (id == R.id.nav_scan) {
             Intent i = new Intent(ManageCardsActivity.this, Main2Activity.class);
-            i.putExtra("EMAIL",login);
-            i.putExtra("PASSWORD",password);
-            i.putExtra("logged", true);
             startActivity(i);
             finish();
         } else if (id == R.id.nav_logout) {
             LogOut();
             Intent i = new Intent(ManageCardsActivity.this, Main2Activity.class);
-            i.putExtra("logged", false);
             startActivity(i);
             finish();
         } else if(id == R.id.nav_manage_rests){
             Intent i = new Intent(ManageCardsActivity.this, ManageRestaurantsActivity.class);
-            i.putExtra("EMAIL",login);
-            i.putExtra("PASSWORD",password);
-            i.putExtra("owner",userID);
             startActivity(i);
             finish();
         }else if(id == R.id.nav_change_account){
             Intent i = new Intent(ManageCardsActivity.this, UserSettings.class);
-            i.putExtra("EMAIL",login);
-            i.putExtra("PASSWORD",password);
-            i.putExtra("owner",userID);
             startActivity(i);
         }
         else if(id == R.id.nav_delete){
@@ -378,6 +361,8 @@ public class ManageCardsActivity extends AppCompatActivity
 
     AlertDialog dialog;
     public void ShowDeleteConfirmDialog(){
+        //TODO
+
         AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
         builder.setMessage("Tem certeza que deseja excluir o usuário?")
                 .setTitle("Deletar Cardápio");
@@ -441,10 +426,11 @@ public class ManageCardsActivity extends AppCompatActivity
 
     }
 
+    //TODO
     public void deleteUser(){
         HashMap<String, String> params = new HashMap<String, String>();
-        params.put("email", login);
-        params.put("password", password);
+        //params.put("email", login);
+        //params.put("password", password);
         Kumulos.call("removeUser", params, new ResponseHandler(){
             @Override
             public void onFailure(@Nullable Throwable error) {
@@ -490,7 +476,7 @@ public class ManageCardsActivity extends AppCompatActivity
         public void onBindViewHolder(CViewHolder holder, int position) {
             String listString;
             if(mList.get(position).daysOfWeek.equals("")) {
-                listString = format2.format(mList.get(position).day);
+                listString = format2.format(mList.get(position).date);
             }
             else{
                 listString = mList.get(position).daysOfWeek;

@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.kumulos.android.Kumulos;
 import com.kumulos.android.ResponseHandler;
 import com.perozzo.cardapiosapp.R;
@@ -67,21 +68,7 @@ public class ConfirmRestaurantActivity extends AppCompatActivity {
         image_img.setImageDrawable(null);
         image_img.setImageBitmap(decodedByte);
 
-        params1 = new HashMap<String, String>();
-        params1.put("byCoords", r.byCoords);
-        params1.put("restaurantID",r.restaurantID);
-        params1.put("icon",r.icon);
-        params1.put("openTime",r.openTime);
-        params1.put("closeTime",r.closeTime);
-        params1.put("telephone",r.telephone);
-        params1.put("name",r.name);
-        params1.put("fullAddr",r.fullAddr);
-        params1.put("latitude",String.valueOf(r.latitude));
-        params1.put("longitude",String.valueOf(r.longitude));
-        params1.put("owner",r.owner);
-        params1.put("city",r.city);
-        params1.put("compl",r.compl);
-        params1.put("addr",r.addr);
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -118,6 +105,21 @@ public class ConfirmRestaurantActivity extends AppCompatActivity {
     }
 
     public void createRestaurant(){
+        params1 = new HashMap<String, String>();
+        params1.put("byCoords", r.byCoords);
+        params1.put("restaurantID",r.restaurantID);
+        params1.put("icon",r.icon);
+        params1.put("openTime",r.openTime);
+        params1.put("closeTime",r.closeTime);
+        params1.put("telephone",r.telephone);
+        params1.put("name",r.name);
+        params1.put("fullAddr",r.fullAddr);
+        params1.put("latitude",String.valueOf(r.latitude));
+        params1.put("longitude",String.valueOf(r.longitude));
+        params1.put("owner",r.owner);
+        params1.put("city",r.city);
+        params1.put("compl",r.compl);
+        params1.put("addr",r.addr);
         Kumulos.call("createRestaurant", params1, new ResponseHandler(){
             @Override
             public void onFailure(@Nullable Throwable error) {

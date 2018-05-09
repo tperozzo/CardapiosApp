@@ -40,6 +40,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.kumulos.android.Kumulos;
 import com.kumulos.android.ResponseHandler;
 import com.perozzo.cardapiosapp.R;
@@ -88,6 +89,7 @@ public class AddEditRestaurantsActivity extends AppCompatActivity {
     public boolean isInit = true;
     public List<Address> addresses = null;
     public FloatingActionButton img_fab;
+    public FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,11 +99,13 @@ public class AddEditRestaurantsActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getWindow().setBackgroundDrawable(null);
         me = this;
+        mAuth = FirebaseAuth.getInstance();
 
         sharedPrefSettings = getSharedPreferences("CARDAPIOSAPP", 0);
         pictureData = getSetting("PICTUREDATA","");
 
-        owner = getIntent().getStringExtra("owner");
+
+        owner = mAuth.getCurrentUser().getUid();
         r = (Restaurant) getIntent().getSerializableExtra("Restaurant");
 
         if(r == null)

@@ -87,6 +87,8 @@
                 android:layout_weight="1"
                 android:textColor="@color/bordoMain"
                 android:text="@string/title_activity_user_login"/>
+
+
         </LinearLayout>
     </LinearLayout>
 

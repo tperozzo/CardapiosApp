@@ -26,6 +26,10 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 import com.kumulos.android.Kumulos;
 import com.kumulos.android.ResponseHandler;
 import com.perozzo.cardapiosapp.R;
@@ -50,6 +54,7 @@ public class SplashActivity extends AppCompatActivity {
     final HashMap<String, String> params1 = new HashMap<String, String>();
     public String API_KEY = "157d9b9a-10e6-4d13-9a9a-c75a8100b46e";
     public String SECRET_KEY = "R9iSn9wVeS9nqkFzSVnwvMgZbRN3e2U3/hVl";
+    public FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +63,7 @@ public class SplashActivity extends AppCompatActivity {
         getWindow().setBackgroundDrawable(null);
         sharedPrefSettings = getSharedPreferences("CARDAPIOSAPP", 0);
         Kumulos.initWithAPIKeyAndSecretKey(API_KEY, SECRET_KEY, this);
+        mAuth = FirebaseAuth.getInstance();
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -69,7 +75,7 @@ public class SplashActivity extends AppCompatActivity {
             public void run() {
                 if(isOnline()) {
                     if (getCredencials()) {
-                        Login();
+                        LoginFirebase();
                     } else
                         goToScan();
                 }
@@ -112,33 +118,20 @@ public class SplashActivity extends AppCompatActivity {
         super.onResume();
     }
 
-    public void Login(){
-        params1.put("email", login);
-        params1.put("password", password);
-        Kumulos.call("login",params1, new ResponseHandler(){
-            @Override
-            public void onFailure(@Nullable Throwable error) {
-                contError ++;
-                if(contError >= 2){
-                    goToScan();
-                    return;
-                }
-                Log.v("CardapiosApp","onFailure " + String.valueOf(contError));
-                Login();
-                super.onFailure(error);
-            }
+    public void LoginFirebase(){
 
+        mAuth.signInWithEmailAndPassword(login, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
-            public void didCompleteWithResult(Object result) {
-                super.didCompleteWithResult(result);
-                ArrayList<LinkedHashMap<String, Object>> objects = (ArrayList<LinkedHashMap<String,Object>>) result;
-                if (!objects.isEmpty()) {
-                    ID = (int)objects.get(0).get("userID");
-                    isLogged = true;
-                    goToMagageRestaurants();
-                }
-                else {
-                    isLogged = false;
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    if(mAuth.getCurrentUser().isEmailVerified()){
+                        goToMagageRestaurants();
+                    }
+                    else{
+                        goToScan();
+                    }
+
+                } else {
                     goToScan();
                 }
             }
@@ -147,16 +140,12 @@ public class SplashActivity extends AppCompatActivity {
 
     public void goToMagageRestaurants(){
         Intent i = new Intent(SplashActivity.this, ManageRestaurantsActivity.class);
-        i.putExtra("owner",String.valueOf(ID));
-        i.putExtra("EMAIL", login);
-        i.putExtra("PASSWORD", password);
         startActivity(i);
         finish();
     }
 
     public void goToScan(){
         Intent i = new Intent(SplashActivity.this, Main2Activity.class);
-        i.putExtra("logged", false);
         startActivity(i);
         finish();
     }

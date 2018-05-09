@@ -1,27 +1,27 @@
 {
   "project_info": {
-    "project_number": "971620683836",
-    "firebase_url": "https://meu-rango-6ec96.firebaseio.com",
-    "project_id": "meu-rango-6ec96",
-    "storage_bucket": "meu-rango-6ec96.appspot.com"
+    "project_number": "405736329483",
+    "firebase_url": "https://cardapiosapp-a67e6.firebaseio.com",
+    "project_id": "cardapiosapp-a67e6",
+    "storage_bucket": "cardapiosapp-a67e6.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:971620683836:android:425a66560a40cb30",
+        "mobilesdk_app_id": "1:405736329483:android:425a66560a40cb30",
         "android_client_info": {
           "package_name": "com.perozzo.cardapiosapp"
         }
       },
       "oauth_client": [
         {
-          "client_id": "971620683836-45qtae8fq1e66smcmef9aae62rbt7nis.apps.googleusercontent.com",
+          "client_id": "405736329483-qlbjbnap3fvr5bgdanamvqi9sfa148qt.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBTT_gYAXF2Yoq5m1NBthWA7WeZBJi9BA0"
+          "current_key": "AIzaSyCNaJVV9wFC8jG9tzYYB2MZiXpuOuOxv-I"
         }
       ],
       "services": {
