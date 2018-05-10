@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -17,6 +18,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.kumulos.android.Kumulos;
 import com.kumulos.android.ResponseHandler;
 import com.perozzo.cardapiosapp.R;
@@ -37,6 +42,8 @@ public class UserSettings extends AppCompatActivity {
     private SharedPreferences sharedPrefSettings;
     public ProgressDialog progressDialog;
 
+    public FirebaseAuth mAuth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +51,7 @@ public class UserSettings extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getWindow().setBackgroundDrawable(null);
+        mAuth = FirebaseAuth.getInstance();
 
         ctx = this;
         sharedPrefSettings = getSharedPreferences("CARDAPIOSAPP", 0);
@@ -67,7 +75,7 @@ public class UserSettings extends AppCompatActivity {
                     validadeFields();
                     if(emailOk && passwordsOk) {
                         ProgressDialog();
-                        updateUser();
+                        updateUserFirebase();
                     }
                 }
                 else{
@@ -93,42 +101,50 @@ public class UserSettings extends AppCompatActivity {
         progressDialog.setIndeterminate(true);
     }
 
-    public void updateUser(){
-        HashMap<String, String> params1 = new HashMap<String, String>();
-        params1.put("email", email);
-        params1.put("password", password);
-        params1.put("userID", ID);
-        Kumulos.call("updateUser", params1, new ResponseHandler(){
-            @Override
-            public void onFailure(@Nullable Throwable error) {
-                updateUserError++;
-                if(updateUserError >= 3){
-                    updateUserError = 0;
-                    progressDialog.dismiss();
-                    Toast.makeText(ctx, getString(R.string.database_fail), Toast.LENGTH_LONG).show();
-                    return;
-                }
-                else{
-                    updateUser();
-                }
-                super.onFailure(error);
-            }
+    public void updateUserFirebase(){
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-            @Override
-            public void didCompleteWithResult(@Nullable Object result) {
-                super.didCompleteWithResult(result);
-                if((int)result == 1) {
-                    Toast.makeText(ctx, getString(R.string.updated_user), Toast.LENGTH_SHORT).show();
-                    progressDialog.dismiss();
-                    SaveCredentials();
-                    finish();
-                }
-                else{
-                    progressDialog.dismiss();
-                    Toast.makeText(ctx, getString(R.string.updated_user_fail), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+        if(!email.equals(user.getEmail())) {
+            user.updateEmail(email)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                //email atualizado
+
+                                user.updatePassword(password)
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    //password atualizado
+                                                    Toast.makeText(getApplicationContext(), getString(R.string.updated_user), Toast.LENGTH_SHORT).show();
+                                                    progressDialog.dismiss();
+                                                    finish();
+                                                }
+                                            }
+                                        });
+                            }
+                        }
+                    });
+        }
+
+        else{
+            user.updatePassword(password)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                //password atualizado
+                                Toast.makeText(getApplicationContext(), getString(R.string.updated_user), Toast.LENGTH_SHORT).show();
+                                progressDialog.dismiss();
+                                finish();
+                            }
+                        }
+                    });
+        }
+
+
     }
 
     public void validadeFields(){

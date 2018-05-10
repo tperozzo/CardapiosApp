@@ -16,6 +16,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -37,7 +38,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.kumulos.android.Kumulos;
@@ -309,32 +314,22 @@ public class ManageRestaurantsActivity extends AppCompatActivity
     }
 
     public void deleteUser(){
-        HashMap<String, String> params = new HashMap<String, String>();
-        //TODO
-        Kumulos.call("removeUser", params, new ResponseHandler(){
+        FirebaseUser user = mAuth.getCurrentUser();
+        user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
-            public void onFailure(@Nullable Throwable error) {
-                progressDialog.dismiss();
-                super.onFailure(error);
+            public void onComplete(@NonNull Task<Void> task) {
+                Toast.makeText(ctx, getString(R.string.removed_user), Toast.LENGTH_LONG).show();
+                LogOut();
+                deleteRestaurantsByUser();
             }
-
-            @Override
-            public void didCompleteWithResult(@Nullable Object result) {
-                if((int)result == 1) {
-                    //progressDialog.dismiss();
-                    Toast.makeText(ctx, "Usuário excluído!", Toast.LENGTH_SHORT).show();
-                    LogOut();
-                    deleteRestaurantsByUser();
-                }
-                else{
-                    progressDialog.dismiss();
-                    Toast.makeText(ctx, "Não foi possível excluir o usuário.", Toast.LENGTH_SHORT).show();
-                }
-                super.didCompleteWithResult(result);
-            }
-
-
-        });
+        })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        progressDialog.dismiss();
+                        Toast.makeText(ctx, getString(R.string.removed_user_fail), Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     public void deleteRestaurantsByUser(){

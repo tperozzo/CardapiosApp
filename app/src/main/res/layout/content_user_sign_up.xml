@@ -13,6 +13,8 @@
     tools:showIn="@layout/app_bar_user_sign_up"
     android:orientation="vertical">
 
+
+
     <View
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -96,5 +98,6 @@
         </LinearLayout>
 
     </LinearLayout>
+
 
 </LinearLayout>

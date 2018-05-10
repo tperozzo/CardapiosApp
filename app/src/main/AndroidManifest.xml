@@ -67,7 +67,8 @@
             android:label="@string/title_activity_user_login"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustPan" />
+            android:windowSoftInputMode="stateAlwaysHidden|adjustPan"
+             />
         <activity
             android:name=".ui.ConfirmRestaurantActivity"
             android:label="@string/title_activity_confirm_restaurant"

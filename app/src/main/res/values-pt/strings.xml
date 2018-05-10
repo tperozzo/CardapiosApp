@@ -157,4 +157,7 @@
     <string name="remove_user_menu">\t\t\t\tRemover Usuário</string>
     <string name="search_cards_menu">\t\t\t\tProcurar Cardápios</string>​
 
+    <string name="removed_user">Usuário Removido</string>
+    <string name="removed_user_fail">Não foi possível remover o usuário.</string>
+
 </resources>

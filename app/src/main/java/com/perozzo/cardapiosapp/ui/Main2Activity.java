@@ -56,7 +56,11 @@ import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.gson.Gson;
 import com.kumulos.android.Kumulos;
 import com.kumulos.android.ResponseHandler;
@@ -795,34 +799,23 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
 
     }
 
-    //TODO
     public void deleteUser(){
-        HashMap<String, String> params = new HashMap<String, String>();
-        //params.put("email", email);
-        //params.put("password", password);
-        Kumulos.call("removeUser", params, new ResponseHandler(){
+        FirebaseUser user = mAuth.getCurrentUser();
+        user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
-            public void onFailure(@Nullable Throwable error) {
-                progressDialog.dismiss();
-                super.onFailure(error);
+            public void onComplete(@NonNull Task<Void> task) {
+                Toast.makeText(ctx, getString(R.string.removed_user), Toast.LENGTH_LONG).show();
+                LogOut();
+                deleteRestaurantsByUser();
             }
-
-            @Override
-            public void didCompleteWithResult(@Nullable Object result) {
-                if((int)result == 1) {
-                    Toast.makeText(ctx, "Usuário excluído!", Toast.LENGTH_SHORT).show();
-                    LogOut();
-                    deleteRestaurantsByUser();
-                }
-                else{
-                    progressDialog.dismiss();
-                    Toast.makeText(ctx, "Não foi possível excluir o usuário.", Toast.LENGTH_SHORT).show();
-                }
-                super.didCompleteWithResult(result);
-            }
-
-
-        });
+        })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        progressDialog.dismiss();
+                        Toast.makeText(ctx, getString(R.string.removed_user_fail), Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     public void deleteRestaurantsByUser(){
