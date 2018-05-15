@@ -116,7 +116,7 @@ public class ManageRestaurantsActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(ManageRestaurantsActivity.this, AddEditRestaurantsActivity.class);
+                Intent i = new Intent(ManageRestaurantsActivity.this, AddEditRestaurantsActivity2.class);
                 startActivity(i);
             }
         });
@@ -229,7 +229,8 @@ public class ManageRestaurantsActivity extends AppCompatActivity
     @Override
     protected void onStop() {
         super.onStop();
-        restaurantsAdapter.clear();
+        if(restaurantsAdapter != null)
+            restaurantsAdapter.clear();
     }
 
 
@@ -448,7 +449,7 @@ public class ManageRestaurantsActivity extends AppCompatActivity
                 edit_btn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent i = new Intent(ManageRestaurantsActivity.this, AddEditRestaurantsActivity.class);
+                        Intent i = new Intent(ManageRestaurantsActivity.this, AddEditRestaurantsActivity2.class);
                         i.putExtra("Restaurant",restaurantsList.get(getAdapterPosition()));
                         SavePictureData(restaurantsList.get(getAdapterPosition()).icon);
                         restaurantsList.get(getAdapterPosition()).icon = "";

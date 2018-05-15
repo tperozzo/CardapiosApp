@@ -160,4 +160,8 @@
     <string name="removed_user">Usuário Removido</string>
     <string name="removed_user_fail">Não foi possível remover o usuário.</string>
 
+    <string name="tab_geral">Geral</string>
+    <string name="tab_address">Endereço</string>
+    <string name="tab_files">Arquivos</string>
+
 </resources>

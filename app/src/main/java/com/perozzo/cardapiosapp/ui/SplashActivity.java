@@ -28,6 +28,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.kumulos.android.Kumulos;
@@ -63,6 +64,7 @@ public class SplashActivity extends AppCompatActivity {
         getWindow().setBackgroundDrawable(null);
         sharedPrefSettings = getSharedPreferences("CARDAPIOSAPP", 0);
         Kumulos.initWithAPIKeyAndSecretKey(API_KEY, SECRET_KEY, this);
+        FirebaseApp.initializeApp(this);
         mAuth = FirebaseAuth.getInstance();
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);

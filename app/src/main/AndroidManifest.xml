@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+
     <protected-broadcast android:name="android.intent.action.MEDIA_MOUNTED" />
 
     <application
@@ -15,6 +16,9 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/logo"
         android:theme="@style/AppTheme">
+
+        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyDNnTVZBm2YO9caVnrgnHPO_CCUowRCMxo"/>
+
         <activity android:name="com.soundcloud.android.crop.CropImageActivity" />
         <activity
             android:name=".ui.SplashActivity"
@@ -67,8 +71,7 @@
             android:label="@string/title_activity_user_login"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustPan"
-             />
+            android:windowSoftInputMode="stateAlwaysHidden|adjustPan" />
         <activity
             android:name=".ui.ConfirmRestaurantActivity"
             android:label="@string/title_activity_confirm_restaurant"
@@ -84,12 +87,16 @@
         <activity android:name=".ui.MainActivity" />
         <activity
             android:name=".ui.Main2Activity"
-            android:screenOrientation="portrait"
             android:label="@string/search_cards"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustPan"></activity>
-
-
+            android:windowSoftInputMode="stateAlwaysHidden|adjustPan" />
+        <activity
+            android:name=".ui.AddEditRestaurantsActivity2"
+            android:label="@string/title_activity_add_edit_restaurants"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustPan"/>
     </application>
 
 </manifest>
